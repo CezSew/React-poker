@@ -1,0 +1,18 @@
+body {
+    font-family: Roboto, sans-serif
+}
+
+.app__board {
+    display: flex;
+}
+.app__hand {
+    display: flex;
+}
+.app__card {
+    margin-right: 20px;
+}
+.app__card.card .card__face {
+    display: block;
+    width: 180px;
+    height: auto;
+}
