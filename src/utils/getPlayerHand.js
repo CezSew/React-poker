@@ -116,10 +116,9 @@ const changeAcesValues = (cards) => {
     return cards;
 }
 
-const isStraight = (cardsArray) => {
-    let result = true;
-    let counter = 0;
+const getStraight = (cardsArray) => {
     let cards = [...cardsArray];
+    let straight = [];
 
     // SWITCH ACES VALUE
 
@@ -140,15 +139,15 @@ const isStraight = (cardsArray) => {
 
     // check if there is straight
     for(let i = 0; i < sortedVals.length - 1; i++) {
-        if(sortedVals[i][0] !== sortedVals[i + 1][0] && sortedVals[i][0] + 1 !== sortedVals[i + 1][0]) {
-            result = false;
-            counter = counter < 4 ? 0 : 4;
-        } else counter++;
+        if(sortedVals[i][0] !== sortedVals[i + 1][0] && sortedVals[i][0] + 1 === sortedVals[i + 1][0]) {
+            if(straight.indexOf(sortedVals[i][0]) === -1) straight.push(sortedVals[i][0]);
+            if(straight.indexOf(sortedVals[i + 1][0]) === -1) straight.push(sortedVals[i + 1][0]);
+        } else if(sortedVals[i][0] !== sortedVals[i + 1][0] && straight.length !== 5){
+            straight = [];
+        }
     }
-    
-    if(counter >= 4) result = true;
 
-    return result;
+    return straight;
 }
 
 const getValueCombos = (vals, colors, cards) => {
@@ -203,7 +202,7 @@ const getValueCombos = (vals, colors, cards) => {
     // is flush
 
     // is straight
-    // console.log(isStraight(cards))
+    // console.log(getStraight(cards))
 
 
     // is three of a kind
@@ -220,7 +219,7 @@ const getValueCombos = (vals, colors, cards) => {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
 
     } else if(!flush) {
-        if(isStraight === true) {
+        if(getStraight(cards).length === 5) {
             combo = `Straight!`;
         } else if (totalCombos === 1 && combos.pair) {
             combo = `Pair of ${translateCard(highestPair)}s`;
@@ -233,9 +232,6 @@ const getValueCombos = (vals, colors, cards) => {
         combo = `Flush of ${flush}`;
     }
 
-    console.log(highestPair)
-    console.log(secondHighestPair)
-    console.log(vals)
     return combo;
 }
 
