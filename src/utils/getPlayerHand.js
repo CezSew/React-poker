@@ -140,13 +140,12 @@ const isStraight = (cardsArray) => {
 
     // check if there is straight
     for(let i = 0; i < sortedVals.length - 1; i++) {
-        if(sortedVals[i][0] + 1 !== sortedVals[i + 1][0]) {
+        if(sortedVals[i][0] !== sortedVals[i + 1][0] && sortedVals[i][0] + 1 !== sortedVals[i + 1][0]) {
             result = false;
-            counter = 0;
+            counter = counter < 4 ? 0 : 4;
         } else counter++;
     }
     
-
     if(counter >= 4) result = true;
 
     return result;
@@ -163,6 +162,7 @@ const getValueCombos = (vals, colors, cards) => {
     let highestThreeOfAKind = 0;
     let highestPair = 0;
     let secondHighestPair = 0;
+    let quads = '';
     let flush = '';
 
     colors.forEach(color => {
@@ -173,16 +173,21 @@ const getValueCombos = (vals, colors, cards) => {
 
     vals.forEach(e => {
         if(e[1] === 2) {
+            if(e[0] === 1) e[0] = 14;
             if(e[0] > highestPair) {
                 secondHighestPair = highestPair;
                 highestPair = e[0];
             } else if(e[0] > secondHighestPair) {  
                 secondHighestPair = e[0];
             }
-            combos.pair++; 
+            if (combos.pair < 2) combos.pair++; 
         } else if(e[1] === 3) { 
             if(e[0] > highestThreeOfAKind) highestThreeOfAKind = e[0];
             combos.three++; 
+        }
+        else if(e[1] === 4) { 
+            combos.four++; 
+            quads = e[0];
         }
     });
 
@@ -198,7 +203,8 @@ const getValueCombos = (vals, colors, cards) => {
     // is flush
 
     // is straight
-    console.log(isStraight(cards))
+    // console.log(isStraight(cards))
+
 
     // is three of a kind
 
@@ -208,14 +214,17 @@ const getValueCombos = (vals, colors, cards) => {
 
     // high card
 
-
-    if(totalCombos === 2 && combos.pair && combos.three) {
+    if(combos.four) {
+        combo += `Quad ${translateCard(quads)}s`;
+    } else if(totalCombos === 2 && combos.pair && combos.three) {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
 
     } else if(!flush) {
-        if (totalCombos === 1 && combos.pair) {
+        if(isStraight === true) {
+            combo = `Straight!`;
+        } else if (totalCombos === 1 && combos.pair) {
             combo = `Pair of ${translateCard(highestPair)}s`;
-        } else if(totalCombos === 2 && combos.pair === 2) {
+        } else if(totalCombos === 2 && combos.pair >= 2) {
             combo = `Two pairs of ${translateCard(highestPair)}s and ${translateCard(secondHighestPair)}s`;
         } else if(totalCombos === 1 && combos.three) {
             combo = `Three of a kind of ${translateCard(highestThreeOfAKind)}s`;
@@ -224,7 +233,9 @@ const getValueCombos = (vals, colors, cards) => {
         combo = `Flush of ${flush}`;
     }
 
-
+    console.log(highestPair)
+    console.log(secondHighestPair)
+    console.log(vals)
     return combo;
 }
 
@@ -260,6 +271,8 @@ const translateCard = (cardVal) => {
             return 'Queen';
         case 13: 
             return 'King';
+        case 14:
+            return 'Ace';
         case 1:
             return 'Ace';
         default:
