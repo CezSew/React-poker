@@ -1,7 +1,7 @@
 const getPlayerHand = (cards) => {
     let valuesAndSuits = checkValues(cards);    
     let flushCombo = getFlushCombo(cards);
-    let combos = getValueCombos(valuesAndSuits, flushCombo);
+    let combos = getValueCombos(valuesAndSuits, flushCombo, cards);
 
     // let stringifiedCombo = stringifyCombo(combos);
 
@@ -107,8 +107,52 @@ const getMultipleOccurances = (occurances) => {
 //     return string;
 // }
 
+const changeAcesValues = (cards) => {
+    cards.forEach(card => {
+        let cardValue = card[0];
+        if(cardValue === 1) card[0] = 14;
+    })
 
-const getValueCombos = (vals, colors) => {
+    return cards;
+}
+
+const isStraight = (cardsArray) => {
+    let result = true;
+    let counter = 0;
+    let cards = [...cardsArray];
+
+    // SWITCH ACES VALUE
+
+    // get sum of vals
+    let valsSum = 0;
+    cards.forEach(el => valsSum += el[0]);
+
+    // if vals sum is more than 40, there is no mathematical chace for wheel straight to occur, so change 1's to 14's
+
+    if(valsSum > 40) {
+        cards = changeAcesValues(cards);
+    }   
+
+    // sort array for straight check
+    let sortedVals = cards.sort((a, b) => {
+        return a[0] - b[0];
+    });
+
+    // check if there is straight
+    for(let i = 0; i < sortedVals.length - 1; i++) {
+        if(sortedVals[i][0] + 1 !== sortedVals[i + 1][0]) {
+            result = false;
+            counter = 0;
+        } else counter++;
+    }
+    
+
+    if(counter >= 4) result = true;
+
+    return result;
+}
+
+const getValueCombos = (vals, colors, cards) => {
     let combos = {
         pair: 0,
         three: 0,
@@ -145,6 +189,26 @@ const getValueCombos = (vals, colors) => {
 
     let totalCombos = combos.pair + combos.three;
 
+    // is royal flush
+
+    // is four of a kind
+
+    // is full house
+
+    // is flush
+
+    // is straight
+    console.log(isStraight(cards))
+
+    // is three of a kind
+
+    // is two pair
+
+    // is one pair
+
+    // high card
+
+
     if(totalCombos === 2 && combos.pair && combos.three) {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
 
@@ -160,11 +224,11 @@ const getValueCombos = (vals, colors) => {
         combo = `Flush of ${flush}`;
     }
 
-    
-
 
     return combo;
 }
+
+
 
 const getFlushCombo = (cards) => {
     let occurances = [];
@@ -196,7 +260,7 @@ const translateCard = (cardVal) => {
             return 'Queen';
         case 13: 
             return 'King';
-        case 14:
+        case 1:
             return 'Ace';
         default:
             return `${cardVal}'`;
