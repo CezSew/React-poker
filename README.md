@@ -1,5 +1,5 @@
 
-# Country population quiz
+# React poker 
 
 ## Available Scripts
 
