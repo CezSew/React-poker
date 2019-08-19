@@ -2,10 +2,11 @@ const getPlayerHand = (cards) => {
     let valuesAndSuits = checkValues(cards);    
     let flushCombo = getFlushCombo(cards);
     let combos = getValueCombos(valuesAndSuits, flushCombo, cards);
-
+    let playerHand = combos[0];
     // let stringifiedCombo = stringifyCombo(combos);
 
-    return combos;
+    console.log(playerHand)
+    return combos[1];
 }
 
 /**
@@ -164,6 +165,8 @@ const getValueCombos = (vals, colors, cards) => {
     let quads = '';
     let flush = '';
 
+    let playerHand = [];
+
     colors.forEach(color => {
         if(color[1] >= 5) {
             flush = color[0];
@@ -190,7 +193,6 @@ const getValueCombos = (vals, colors, cards) => {
         }
     });
 
-
     let totalCombos = combos.pair + combos.three;
 
     // is royal flush
@@ -215,27 +217,81 @@ const getValueCombos = (vals, colors, cards) => {
 
     if(combos.four) {
         combo += `Quad ${translateCard(quads)}s`;
+        playerHand = getStrongestHand(quads, cards);
     } else if(totalCombos === 2 && combos.pair && combos.three) {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
-
+        playerHand = getStrongestHand([quads, quads, quads, quads], cards);
     } else if(!flush) {
         if(getStraight(cards).length === 5) {
+            playerHand = getStrongestHand(getStraight(cards), cards);
             combo = `Straight!`;
         } else if (totalCombos === 1 && combos.pair) {
             combo = `Pair of ${translateCard(highestPair)}s`;
+            playerHand = getStrongestHand([highestPair, highestPair], cards);
         } else if(totalCombos === 2 && combos.pair >= 2) {
             combo = `Two pairs of ${translateCard(highestPair)}s and ${translateCard(secondHighestPair)}s`;
+            playerHand = getStrongestHand([highestPair, highestPair, secondHighestPair, secondHighestPair], cards);
         } else if(totalCombos === 1 && combos.three) {
             combo = `Three of a kind of ${translateCard(highestThreeOfAKind)}s`;
+            playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind], cards);
         }
     } else if(flush) {
         combo = `Flush of ${flush}`;
+        playerHand = getStrongestHand(flush, cards);
     }
 
-    return combo;
+    return [playerHand, combo];
 }
 
 
+const getStrongestHand = (combo, cards) => {
+    let usedCards = [];
+
+    if(combo.length !== 5) {
+        cards.forEach(card => {
+            combo.forEach(val => {
+                if(card[0] === val) {
+                    let existsInArray = false;
+                    usedCards.forEach(el => {
+                        if(el[0] === card[0] && el[1] === card[1]) {
+                            existsInArray = true;
+                        }
+                    })
+                    if(!existsInArray) usedCards.push([card[0], card[1]]);
+                }
+            })
+        })
+        let unusedCards = getArrayDifference(cards, usedCards).map(el => { 
+            if(el[0] === 1) { 
+                el[0] = 14; 
+            } 
+            return [el[0], el[1]];
+        });
+        let bestRemainingCards = unusedCards.sort((a, b) => { return b[0] - a[0]; }).slice(0, 5 - combo.length);
+        console.log(unusedCards)
+        console.log(bestRemainingCards)
+        
+        return [...usedCards, ...bestRemainingCards];
+    } else {
+        return [];
+    }
+}
+
+const getArrayDifference = (cards, usedCards) => {
+    let unusedCards = [];
+    cards.forEach((card, index) => {
+        let found = false;
+        usedCards.forEach(usedCard => {
+            if(card[0] === usedCard[0] && card[1] === usedCard[1]) found = true;
+        });
+
+        if(!found) {
+            unusedCards.push([card[0], card[1]]);
+        } 
+    });
+
+    return unusedCards;
+}
 
 const getFlushCombo = (cards) => {
     let occurances = [];
