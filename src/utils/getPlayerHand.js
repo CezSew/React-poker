@@ -195,46 +195,39 @@ const getValueCombos = (vals, colors, cards) => {
 
     let totalCombos = combos.pair + combos.three;
 
-    // is royal flush
-
-    // is four of a kind
-
-    // is full house
-
-    // is flush
-
-    // is straight
-    // console.log(getStraight(cards))
-
-
-    // is three of a kind
-
-    // is two pair
-
-    // is one pair
-
-    // high card
-
+    // quads
     if(combos.four) {
         combo += `Quad ${translateCard(quads)}s`;
-        playerHand = getStrongestHand(quads, cards);
+        playerHand = getStrongestHand([quads, quads, quads, quads], cards);
+
+    // full house
     } else if(totalCombos === 2 && combos.pair && combos.three) {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
-        playerHand = getStrongestHand([quads, quads, quads, quads], cards);
+        playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind, highestPair, highestPair], cards);
     } else if(!flush) {
+
+        // straight
         if(getStraight(cards).length === 5) {
             playerHand = getStrongestHand(getStraight(cards), cards);
             combo = `Straight!`;
+        
+        // pair
         } else if (totalCombos === 1 && combos.pair) {
             combo = `Pair of ${translateCard(highestPair)}s`;
             playerHand = getStrongestHand([highestPair, highestPair], cards);
+        
+        // two pair
         } else if(totalCombos === 2 && combos.pair >= 2) {
             combo = `Two pairs of ${translateCard(highestPair)}s and ${translateCard(secondHighestPair)}s`;
             playerHand = getStrongestHand([highestPair, highestPair, secondHighestPair, secondHighestPair], cards);
+        
+        // three of a kind
         } else if(totalCombos === 1 && combos.three) {
             combo = `Three of a kind of ${translateCard(highestThreeOfAKind)}s`;
             playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind], cards);
         }
+
+        //flush
     } else if(flush) {
         combo = `Flush of ${flush}`;
         playerHand = getStrongestHand(flush, cards);
@@ -246,7 +239,6 @@ const getValueCombos = (vals, colors, cards) => {
 
 const getStrongestHand = (combo, cards) => {
     let usedCards = [];
-
     if(combo.length !== 5) {
         cards.forEach(card => {
             combo.forEach(val => {
