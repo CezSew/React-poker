@@ -22,7 +22,9 @@ class App extends React.Component {
       remainingCards: this.deck,
       randomlySelectedCards: [],
       playerCards: [],
-      board: []
+      board: [],
+      playerHandString: '',
+      playerHand: []
     }
 
     this.state = this.initialState;
@@ -61,13 +63,15 @@ class App extends React.Component {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
+
     // let playerHand = utils.getPlayerHand([[6, "d"], [8, "d"], [12, "h"], [7, "h"], [8, "d"], [8, "s"], [5, "c"]]);
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
         remainingCards: remainingCards,
         board: [...this.state.board, ...randomCards],
-        playerHand: playerHand
+        playerHandString: playerHand[1],
+        playerHand: playerHand[0]
       }
     );
   }
@@ -79,7 +83,8 @@ class App extends React.Component {
         remainingCards: this.deck,
         board: [],
         playerCards: [],
-        playerHand: ''
+        playerHandString: '',
+        playerHand: []
       }
     );
   }
@@ -87,6 +92,7 @@ class App extends React.Component {
   render() {
     let board = this.state.board.map(card => <Card key={this.getKey()} card={card}/>);
     let playerCards = this.state.playerCards.map(card => <Card key={this.getKey()} card={card}/>);
+    let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
          <button onClick={(e) => this.hitThBoard(3)}>Get flop</button>
@@ -98,8 +104,12 @@ class App extends React.Component {
          Your cards <br/>
          <ul  className="app__hand">{playerCards}</ul>
         <br />
-         Your hand <br/>
-         {this.state.playerHand}
+         Your hand <br/><br/>
+         {this.state.playerHand}<br/><br/><br/>
+         Your strongest set of cards:
+         <ul  className="app__hand">
+         {strongestHand}
+         </ul>
       </div>
     );
   }

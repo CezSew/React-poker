@@ -6,7 +6,7 @@ const getPlayerHand = (cards) => {
     // let stringifiedCombo = stringifyCombo(combos);
 
     console.log(playerHand)
-    return combos[1];
+    return combos;
 }
 
 /**
@@ -268,8 +268,11 @@ const getStrongestHand = (combo, cards) => {
             return [el[0], el[1]];
         });
         let bestRemainingCards = unusedCards.sort((a, b) => { return b[0] - a[0]; }).slice(0, 5 - combo.length);
-        console.log(unusedCards)
-        console.log(bestRemainingCards)
+        
+        // turn aces into proper val
+        bestRemainingCards.forEach(card => {
+            if(card[0] === 14) card[0] = 1;
+        })
         
         return [...usedCards, ...bestRemainingCards];
     } else {
