@@ -63,8 +63,7 @@ class App extends React.Component {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
-
-    // let playerHand = utils.getPlayerHand([[6, "d"], [8, "d"], [12, "h"], [7, "h"], [8, "d"], [8, "s"], [5, "c"]]);
+    console.log(playerHand)
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
@@ -105,7 +104,7 @@ class App extends React.Component {
          <ul  className="app__hand">{playerCards}</ul>
         <br />
          Your hand <br/><br/>
-         {this.state.playerHand}<br/><br/><br/>
+         {this.state.playerHandString}<br/><br/><br/>
          Your strongest set of cards:
          <ul  className="app__hand">
          {strongestHand}

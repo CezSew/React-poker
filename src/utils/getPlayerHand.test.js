@@ -19,7 +19,8 @@ test('straight', () => {
     expect(getPlayerHand([[1, "d"], [2, "h"], [5, "s"], [4, "h"], [3, "s"]])[1]).toBe("Straight!");
     expect(getPlayerHand([[1, "d"], [4, "h"], [5, "s"], [2, "h"], [3, "s"]])[1]).toBe("Straight!");
     expect(getPlayerHand([[1, "d"], [12, "h"], [13, "s"], [11, "h"], [10, "s"]])[1]).toBe("Straight!");
-    expect(getPlayerHand([[1, "h"], [12, "7"], [5, "c"], [8, "h"], [6, "c"], [4, "h"]])[1]).toBe("Straight!");
+    expect(getPlayerHand([[1, "h"], [7, "h"], [5, "c"], [8, "h"], [6, "c"], [4, "h"]])[1]).toBe("Straight!");
+    expect(getPlayerHand([[9, "c"], [7, "d"], [6, "h"], [8, "d"], [10, "s"]])[1]).toBe("Straight!");
 });
 
 test('full house', () => {
