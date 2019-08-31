@@ -88,6 +88,7 @@ const changeAcesValues = (cards) => {
 const getStraight = (cardsArray) => {
     let cards = [...cardsArray];
     let straight = [];
+    let colors = [];
 
     let valsSum = 0;
     cards.forEach(el => valsSum += el[0]); // get sum of vals
@@ -102,14 +103,24 @@ const getStraight = (cardsArray) => {
     
     for(let i = 0; i < sortedVals.length - 1; i++) { // check if there is straight
         if(sortedVals[i][0] !== sortedVals[i + 1][0] && sortedVals[i][0] + 1 === sortedVals[i + 1][0]) {
-            if(straight.indexOf(sortedVals[i][0]) === -1) straight.push(sortedVals[i][0]);
-            if(straight.indexOf(sortedVals[i + 1][0]) === -1) straight.push(sortedVals[i + 1][0]);
+            if(straight.indexOf(sortedVals[i][0]) === -1) {
+                straight.push(sortedVals[i][0]);
+                colors.push(sortedVals[i][1]);
+            };
+            if(straight.indexOf(sortedVals[i + 1][0]) === -1) {
+                straight.push(sortedVals[i + 1][0]);
+                colors.push(sortedVals[i + 1][1]);
+            } 
         } else if(sortedVals[i][0] !== sortedVals[i + 1][0] && straight.length !== 5){
             straight = [];
         }
     }
 
-    return straight;
+    let result = straight.map((val, i) => {
+        return [val, colors[i]];
+    })
+
+    return result;
 }
 
 const getValueCombos = (vals, colors, cards) => {
@@ -126,6 +137,7 @@ const getValueCombos = (vals, colors, cards) => {
     let quads = '';
     let flush = '';
     let playerHand = [];
+    let straight = getStraight(cards);
 
     colors.forEach(color => {
         if(color[1] >= 5) {
@@ -162,9 +174,9 @@ const getValueCombos = (vals, colors, cards) => {
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
         playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind, highestPair, highestPair], cards);
     } else if(!flush) {
-        if(getStraight(cards).length === 5) { // straight
-            playerHand = getStrongestHand(getStraight(cards), cards);
-            combo = `Straight!`;
+        if(straight.length === 5) { // straight
+            playerHand = straight;
+            combo = `Straight, ${translateCard(playerHand[0][0])} to ${translateCard(playerHand[playerHand.length - 1][0])}`;
         } else if (totalCombos === 1 && combos.pair) { // pair
             combo = `Pair of ${translateCard(highestPair)}s`;
             playerHand = getStrongestHand([highestPair, highestPair], cards);
@@ -195,7 +207,7 @@ const orderCardsByValue = (cards) => {
     orderedCards.forEach(card => { //translate aces back
         if(card[0] === 14) card[0] = 1;
     });
-    return orderedCards;
+    return orderedCards.splice(0, 5);
 }
 
 const getStrongestHand = (combo, cards) => {

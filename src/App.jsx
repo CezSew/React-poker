@@ -24,7 +24,8 @@ class App extends React.Component {
       playerCards: [],
       board: [],
       playerHandString: '',
-      playerHand: []
+      playerHand: [],
+      gameStep: ''
     }
 
     this.state = this.initialState;
@@ -54,23 +55,25 @@ class App extends React.Component {
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
         remainingCards: remainingCards,
-        playerCards: [...randomCards]
+        playerCards: [...randomCards],
+        gameStep: 'start'
       }
     );
   }
 
-  hitThBoard(numberOfCards) {
+  hitThBoard(numberOfCards, step) {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
-    console.log(playerHand)
+ // let playerHand = utils.getPlayerHand([[7, "c"], [2, "d"], [9, "h"], [8, "s"], [5, "d"], [6, "c"]]);
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
         remainingCards: remainingCards,
         board: [...this.state.board, ...randomCards],
         playerHandString: playerHand[1],
-        playerHand: playerHand[0]
+        playerHand: playerHand[0],
+        gameStep: step
       }
     );
   }
@@ -83,7 +86,8 @@ class App extends React.Component {
         board: [],
         playerCards: [],
         playerHandString: '',
-        playerHand: []
+        playerHand: [],
+        gameStep: ''
       }
     );
   }
@@ -94,11 +98,14 @@ class App extends React.Component {
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
-         <button onClick={(e) => this.hitThBoard(3)}>Get flop</button>
-         <button onClick={(e) => this.hitThBoard(1)}>Get turn</button>
-         <button onClick={(e) => this.hitThBoard(1)}>Get river</button>
-         <button onClick={this.shuffleTheDeck}>Shuffle</button>
-         <button onClick={this.getHands}>Get your cards!</button> <br/>
+        {this.state.gameStep === '' && <button onClick={this.getHands}>Get your cards!</button>}
+        {this.state.gameStep === 'start' && <button onClick={(e) => this.hitThBoard(3, 'flop')}>Get flop</button>}
+        {this.state.gameStep === 'flop' && <button onClick={(e) => this.hitThBoard(1, 'turn')}>Get turn</button>}
+        {this.state.gameStep === 'turn' && <button onClick={(e) => this.hitThBoard(1, 'river')}>Get river</button>}
+         
+        
+        <button onClick={this.shuffleTheDeck}>Shuffle</button>
+         
          <ul className="app__board">{board}</ul><br/>
          Your cards <br/>
          <ul  className="app__hand">{playerCards}</ul>
