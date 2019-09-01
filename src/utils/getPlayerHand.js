@@ -122,6 +122,16 @@ const getStraight = (cardsArray) => {
 
     return result.splice(0, 5);
 }
+const getFlushName = (colors) => {
+    let flush;
+    colors.forEach(color => {
+        if(color[1] >= 5) {
+            flush = color[0];
+        } 
+    })
+    
+    return flush;
+} 
 
 const getValueCombos = (vals, colors, cards) => {
     let combos = {
@@ -135,15 +145,9 @@ const getValueCombos = (vals, colors, cards) => {
     let highestPair = 0;
     let secondHighestPair = 0;
     let quads = '';
-    let flush = '';
+    let flush = getFlushName(colors);
     let playerHand = [];
     let straight = getStraight(cards);
-
-    colors.forEach(color => {
-        if(color[1] >= 5) {
-            flush = color[0];
-        } 
-    })
 
     vals.forEach(e => {
         if(e[1] === 2) {
@@ -192,8 +196,8 @@ const getValueCombos = (vals, colors, cards) => {
             playerHand = cardsOrderedByValue;
         }
     } else if(flush) { //flush
-        combo = `Flush of ${flush}`;
-        playerHand = getStrongestHand(flush, cards);
+        combo = `Flush of ${translateSuit(flush)}`;
+        playerHand = getFlushCards(flush, cards);
     } 
     return [playerHand, combo];
 }
@@ -234,11 +238,13 @@ const getStrongestHand = (combo, cards, fullHouse) => {
         });
         let bestRemainingCards = unusedCards.sort((a, b) => { return b[0] - a[0]; }).slice(0, 5 - combo.length);
         
+        usedCards.forEach(card => {
+            if(card[0] === 14) card[0] = 1;
+        })
         // turn aces into proper val
         bestRemainingCards.forEach(card => {
             if(card[0] === 14) card[0] = 1;
         })
-        
         return [...usedCards, ...bestRemainingCards];
     } else {
         return [];
@@ -283,6 +289,17 @@ const getFlushCombo = (cards) => {
     return occurances;
 }
 
+const getFlushCards = (flush, cards) => {
+    let hand = cards.filter( card => {
+        if(card[1] === flush) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+    return orderCardsByValue(hand);
+}
+
 const translateCard = (cardVal) => {
     switch(cardVal) {
         case 11:
@@ -297,6 +314,21 @@ const translateCard = (cardVal) => {
             return 'Ace';
         default:
             return `${cardVal}'`;
+    }
+}
+
+const translateSuit = (color) => {
+    switch(color) {
+        case 'c':
+            return 'clubs';
+        case 'd':
+            return 'diamonds';
+        case 's': 
+            return 'spades';
+        case 'h':
+            return 'hearts';
+        default:
+            return '';
     }
 }
 

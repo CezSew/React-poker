@@ -65,7 +65,7 @@ class App extends React.Component {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
-//  let playerHand = utils.getPlayerHand([[6, "d"], [5, "s"], [10, "c"], [4, "c"], [11, "s"], [2, "s"], [3, "s"]]);
+    // let playerHand = utils.getPlayerHand([[2, "d"], [10, "d"], [14, "h"], [10, "c"], [3, "s"], [14, "c"], [9, "d"]]);
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
