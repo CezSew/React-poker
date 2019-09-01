@@ -65,7 +65,7 @@ class App extends React.Component {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
- // let playerHand = utils.getPlayerHand([[7, "c"], [2, "d"], [9, "h"], [8, "s"], [5, "d"], [6, "c"]]);
+//  let playerHand = utils.getPlayerHand([[6, "d"], [5, "s"], [10, "c"], [4, "c"], [11, "s"], [2, "s"], [3, "s"]]);
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
@@ -98,24 +98,34 @@ class App extends React.Component {
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
-        {this.state.gameStep === '' && <button onClick={this.getHands}>Get your cards!</button>}
-        {this.state.gameStep === 'start' && <button onClick={(e) => this.hitThBoard(3, 'flop')}>Get flop</button>}
-        {this.state.gameStep === 'flop' && <button onClick={(e) => this.hitThBoard(1, 'turn')}>Get turn</button>}
-        {this.state.gameStep === 'turn' && <button onClick={(e) => this.hitThBoard(1, 'river')}>Get river</button>}
+
          
+        <main className="app__table">
+          <ul className="app__board">{board}</ul>
+          <ul  className="app__hand">{playerCards}</ul>
+        </main>
+        <section className="app__controlls">
+          {this.state.gameStep === '' && <button onClick={this.getHands}>Get your cards!</button>}
+          {this.state.gameStep === 'start' && <button onClick={(e) => this.hitThBoard(3, 'flop')}>Get flop</button>}
+          {this.state.gameStep === 'flop' && <button onClick={(e) => this.hitThBoard(1, 'turn')}>Get turn</button>}
+          {this.state.gameStep === 'turn' && <button onClick={(e) => this.hitThBoard(1, 'river')}>Get river</button>}
+          <button onClick={this.shuffleTheDeck}>Shuffle</button>
+          
+         
+          <br />
+          <br/><br/><br/>
+
+          {this.state.playerHandString && 
+          <aside className="app__strongest-hand-wrapper">
+          Your strongest set of cards:
+            <ul  className="app__strongest-hand">
+              {strongestHand}
+            </ul>  <br/>   
+          {this.state.playerHandString}
+          </aside> }
+         
+        </section>
         
-        <button onClick={this.shuffleTheDeck}>Shuffle</button>
-         
-         <ul className="app__board">{board}</ul><br/>
-         Your cards <br/>
-         <ul  className="app__hand">{playerCards}</ul>
-        <br />
-         Your hand <br/><br/>
-         {this.state.playerHandString}<br/><br/><br/>
-         Your strongest set of cards:
-         <ul  className="app__hand">
-         {strongestHand}
-         </ul>
       </div>
     );
   }

@@ -120,7 +120,7 @@ const getStraight = (cardsArray) => {
         return [val, colors[i]];
     })
 
-    return result;
+    return result.splice(0, 5);
 }
 
 const getValueCombos = (vals, colors, cards) => {
@@ -172,7 +172,7 @@ const getValueCombos = (vals, colors, cards) => {
         playerHand = getStrongestHand([quads, quads, quads, quads], cards);
     } else if(totalCombos === 2 && combos.pair && combos.three) {    // full house
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
-        playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind, highestPair, highestPair], cards);
+        playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind, highestPair, highestPair], cards, true);
     } else if(!flush) {
         if(straight.length === 5) { // straight
             playerHand = straight;
@@ -210,9 +210,9 @@ const orderCardsByValue = (cards) => {
     return orderedCards.splice(0, 5);
 }
 
-const getStrongestHand = (combo, cards) => {
+const getStrongestHand = (combo, cards, fullHouse) => {
     let usedCards = [];
-    if(combo.length !== 5) {
+    if(combo.length !== 5 || fullHouse) {
         cards.forEach(card => {
             combo.forEach(val => {
                 if(card[0] === val) {

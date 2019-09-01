@@ -5,14 +5,53 @@ body {
 .app__board {
     display: flex;
 }
+.app__strongest-hand { 
+    display: flex;
+    margin-top: 10px;
+}
+.app__strongest-hand-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
 .app__hand {
     display: flex;
+    position: absolute;
+    bottom: 20px;
+    left: calc(50% - 112px);
 }
 .app__card {
-    margin-right: 20px;
+    margin-right: 3px;
 }
 .app__card.card .card__face {
     display: block;
-    width: 180px;
+    width: 110px;
     height: auto;
+}
+.app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.app__table {
+    position: relative;
+    width:900px;
+    height: 900px;
+    background-image: url('/img/table_ver1.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.app__strongest-hand .app__card.card .card__face {
+    width: 55px;
 }
