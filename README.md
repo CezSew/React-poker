@@ -1,6 +1,8 @@
 
 # React poker 
 
+Simulation of holdem poker. Player is dealt two cards, and can simulate flop, turn and river. Application shows the strongest hand that player has.
+
 ## Available Scripts
 
 In the project directory, you can run:
