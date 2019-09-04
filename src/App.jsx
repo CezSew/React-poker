@@ -98,20 +98,17 @@ class App extends React.Component {
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
-
-         
         <main className="app__table">
           <ul className="app__board">{board}</ul>
           <ul  className="app__hand">{playerCards}</ul>
         </main>
         <section className="app__controlls">
-          {this.state.gameStep === '' && <button onClick={this.getHands}>Get your cards!</button>}
-          {this.state.gameStep === 'start' && <button onClick={(e) => this.hitThBoard(3, 'flop')}>Get flop</button>}
-          {this.state.gameStep === 'flop' && <button onClick={(e) => this.hitThBoard(1, 'turn')}>Get turn</button>}
-          {this.state.gameStep === 'turn' && <button onClick={(e) => this.hitThBoard(1, 'river')}>Get river</button>}
-          <button onClick={this.shuffleTheDeck}>Shuffle</button>
+          {this.state.gameStep === '' && <button className="button button--action" onClick={this.getHands}>Deal the hands</button>}
+          {this.state.gameStep === 'start' && <button className="button button--action"  onClick={(e) => this.hitThBoard(3, 'flop')}>Check</button>}
+          {this.state.gameStep === 'flop' && <button className="button button--action" onClick={(e) => this.hitThBoard(1, 'turn')}>Check</button>}
+          {this.state.gameStep === 'turn' && <button className="button button--action"  onClick={(e) => this.hitThBoard(1, 'river')}>Check</button>}
+          <button className="button button--shuffle"  onClick={this.shuffleTheDeck}>Shuffle</button>
           
-         
           <br />
           <br/><br/><br/>
 
