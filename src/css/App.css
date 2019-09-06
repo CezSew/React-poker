@@ -18,11 +18,19 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     color: #fff;
 }
+.app__strongest-hand-wrapper--opponent {
+    right: unset;
+    left: 20px;
+}
 .app__hand {
     display: flex;
     position: absolute;
     bottom: 20px;
     left: calc(50% - 112px);
+}
+.app__hand.app__hand--opponent {
+    bottom: unset;
+    top: 20px;
 }
 .app__card {
     margin-right: 3px;

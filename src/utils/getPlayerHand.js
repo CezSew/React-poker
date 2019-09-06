@@ -4,7 +4,7 @@ const getPlayerHand = (cards) => {
     let combos = getValueCombos(valuesAndSuits, flushCombo, cards);
     // let playerHand = combos[0];
     // let stringifiedCombo = stringifyCombo(combos);
-    console.log(combos)
+    // console.log(combos)
     return combos;
 }
 

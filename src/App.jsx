@@ -10,7 +10,7 @@ class App extends React.Component {
   constructor() {
     super();
 
-    this.getRandomCard = this.getRandomCard.bind(this);
+    // this.getRandomCard = this.getRandomCard.bind(this);
     this.getHands = this.getHands.bind(this);
     this.shuffleTheDeck = this.shuffleTheDeck.bind(this);
     this.getKey = this.getKey.bind(this);
@@ -22,9 +22,12 @@ class App extends React.Component {
       remainingCards: this.deck,
       randomlySelectedCards: [],
       playerCards: [],
+      opponentCards: [],
       board: [],
       playerHandString: '',
+      opponentHandString: '',
       playerHand: [],
+      opponentHand: [],
       gameStep: ''
     }
 
@@ -35,27 +38,33 @@ class App extends React.Component {
     return this.keyCount++;
   }
   
-  getRandomCard() {
-    let randomCard = utils.getRandomCards(this.state.remainingCards, 1);
-    let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCard);
+  // getRandomCard() {
+  //   let randomCard = utils.getRandomCards(this.state.remainingCards, 1);
+  //   let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCard);
   
-    this.setState(
-      {
-        randomlySelectedCards: [...this.state.randomlySelectedCards, randomCard],
-        remainingCards: remainingCards
-      }
-    );
-  }
+  //   this.setState(
+  //     {
+  //       randomlySelectedCards: [...this.state.randomlySelectedCards, randomCard],
+  //       remainingCards: remainingCards
+  //     }
+  //   );
+  // }
 
   getHands() {
-    let randomCards = utils.getRandomCards(this.state.remainingCards, 2);
+    let randomCards = utils.getRandomCards(this.state.remainingCards, 4);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
+   
+    //get opponent hand
+    let opponentRandomCards = randomCards.slice(0, 2);
+    let playerRandomCards = randomCards.slice(2, 4);
+
 
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
         remainingCards: remainingCards,
-        playerCards: [...randomCards],
+        playerCards: [...playerRandomCards],
+        opponentCards: [...opponentRandomCards],
         gameStep: 'start'
       }
     );
@@ -65,14 +74,18 @@ class App extends React.Component {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
+    let opponentHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.opponentCards)]);
     // let playerHand = utils.getPlayerHand([[2, "d"], [10, "d"], [14, "h"], [10, "c"], [3, "s"], [14, "c"], [9, "d"]]);
+
     this.setState(
       {
         randomlySelectedCards: [...this.state.randomlySelectedCards, ...randomCards],
         remainingCards: remainingCards,
         board: [...this.state.board, ...randomCards],
         playerHandString: playerHand[1],
+        opponentHandString: opponentHand[1],
         playerHand: playerHand[0],
+        opponentHand: opponentHand[0],
         gameStep: step
       }
     );
@@ -87,6 +100,9 @@ class App extends React.Component {
         playerCards: [],
         playerHandString: '',
         playerHand: [],
+        opponentCards: [],
+        opponentHand: [],
+        opponentHandString: '',
         gameStep: ''
       }
     );
@@ -95,12 +111,15 @@ class App extends React.Component {
   render() {
     let board = this.state.board.map(card => <Card key={this.getKey()} card={card}/>);
     let playerCards = this.state.playerCards.map(card => <Card key={this.getKey()} card={card}/>);
+    let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={card}/>);
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
+    let strongestOpponentHand = this.state.opponentHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
         <main className="app__table">
           <ul className="app__board">{board}</ul>
-          <ul  className="app__hand">{playerCards}</ul>
+          <ul  className="app__hand app__hand--player">{playerCards}</ul>
+          <ul  className="app__hand app__hand--opponent">{opponentCards}</ul>
         </main>
         <section className="app__controlls">
           {this.state.gameStep === '' && <button className="button button--action" onClick={this.getHands}>Deal the hands</button>}
@@ -119,6 +138,15 @@ class App extends React.Component {
               {strongestHand}
             </ul>  <br/>   
           {this.state.playerHandString}
+          </aside> }
+
+          {this.state.playerHandString && 
+          <aside className="app__strongest-hand-wrapper app__strongest-hand-wrapper--opponent">
+          Your strongest set of cards:
+            <ul  className="app__strongest-hand">
+              {strongestOpponentHand}
+            </ul>  <br/>   
+          {this.state.opponentHandString}
           </aside> }
          
         </section>
