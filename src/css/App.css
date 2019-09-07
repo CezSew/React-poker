@@ -4,6 +4,9 @@ body {
 
 .app__board {
     display: flex;
+    -webkit-box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
 }
 .app__strongest-hand { 
     display: flex;
@@ -22,11 +25,15 @@ body {
     right: unset;
     left: 20px;
 }
+
 .app__hand {
     display: flex;
     position: absolute;
     bottom: 20px;
     left: calc(50% - 112px);
+    -webkit-box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
 }
 .app__hand.app__hand--opponent {
     bottom: unset;
@@ -34,6 +41,7 @@ body {
 }
 .app__card {
     margin-right: 3px;
+
 }
 .app__card.card .card__face {
     display: block;

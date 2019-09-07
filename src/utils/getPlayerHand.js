@@ -1,12 +1,12 @@
+
 const getPlayerHand = (cards) => {
     let valuesAndSuits = checkValues(cards);    
     let flushCombo = getFlushCombo(cards);
     let combos = getValueCombos(valuesAndSuits, flushCombo, cards);
-    // let playerHand = combos[0];
-    // let stringifiedCombo = stringifyCombo(combos);
-    // console.log(combos)
+
     return combos;
 }
+
 
 /**
  * Get array of occurances of all cards on a table
@@ -25,7 +25,6 @@ const checkValues = (cards) => {
             } else {
                 occurances.push([val, 1]);
             }
-
         } else {
             occurances.push([val, 1]);
         }
@@ -36,6 +35,7 @@ const checkValues = (cards) => {
     return multiOccurances;
 }
 
+
 /**
  * Return index of item in multidimensional array that matches the inner array val of given index
  * @param {array} array 
@@ -44,7 +44,6 @@ const checkValues = (cards) => {
  */
 const findValueIndexInMultidimensionalArray = (array, item, checkIndex) => {
     let result = -1;
-
     array.forEach( (el, index) => {
         if(el[checkIndex] === item) {
             result = index;
@@ -53,6 +52,7 @@ const findValueIndexInMultidimensionalArray = (array, item, checkIndex) => {
 
     return result;
 } 
+
 
 /**
  * Get only multiple occurances of cards
@@ -66,10 +66,16 @@ const getMultipleOccurances = (occurances) => {
             result.push(el, el[1]);
         }
     }) 
+
     return result;
 }
 
 
+/**
+ * Switch aces values from 1 to 14 for value comparisons
+ * @param {array} cards
+ * @returns {array} 
+ */
 const changeAcesValues = (cards) => {
     cards.forEach(card => {
         let cardValue = card[0];
@@ -79,12 +85,12 @@ const changeAcesValues = (cards) => {
     return cards;
 }
 
+
 /**
  * Get chain of consecutive cards in values
  * @param {array} cardsArray
  * @returns {array} array of cards in straight 
  */
-
 const getStraight = (cardsArray) => {
     let cards = [...cardsArray];
     let straight = [];
@@ -122,6 +128,12 @@ const getStraight = (cardsArray) => {
 
     return result.splice(0, 5);
 }
+
+/**
+ * Gets array of color occurances, if one color occurs more or equal 5 times, flush is recorded
+ * @param {array} colors
+ * @returns {string} returns name of the flush 
+ */
 const getFlushName = (colors) => {
     let flush;
     colors.forEach(color => {
@@ -133,6 +145,13 @@ const getFlushName = (colors) => {
     return flush;
 } 
 
+/**
+ * If there is a combo, this function will find it
+ * @param {array} vals 
+ * @param {array} colors 
+ * @param {array} cards
+ * @returns {array} return array of cards, combo as a string and numercal value of the combo 
+ */
 const getValueCombos = (vals, colors, cards) => {
     let combos = {
         pair: 0,
@@ -148,6 +167,7 @@ const getValueCombos = (vals, colors, cards) => {
     let flush = getFlushName(colors);
     let playerHand = [];
     let straight = getStraight(cards);
+    let numericalComboValue = 0;
 
     vals.forEach(e => {
         if(e[1] === 2) {
@@ -174,22 +194,28 @@ const getValueCombos = (vals, colors, cards) => {
     if(combos.four) { // quads
         combo += `Quad ${translateCard(quads)}s`;
         playerHand = getStrongestHand([quads, quads, quads, quads], cards);
+        numericalComboValue = 7;
     } else if(totalCombos === 2 && combos.pair && combos.three) {    // full house
         combo += `Full house ${translateCard(highestThreeOfAKind)}s and ${translateCard(highestPair)}s`;
         playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind, highestPair, highestPair], cards, true);
+        numericalComboValue = 6;
     } else if(!flush) {
         if(straight.length === 5) { // straight
             playerHand = straight;
             combo = `Straight, ${translateCard(playerHand[0][0])} to ${translateCard(playerHand[playerHand.length - 1][0])}`;
+            numericalComboValue = 4;
         } else if (totalCombos === 1 && combos.pair) { // pair
             combo = `Pair of ${translateCard(highestPair)}s`;
             playerHand = getStrongestHand([highestPair, highestPair], cards);
+            numericalComboValue = 1;
         } else if(totalCombos === 2 && combos.pair >= 2) { // two pair
             combo = `Two pairs of ${translateCard(highestPair)}s and ${translateCard(secondHighestPair)}s`;
             playerHand = getStrongestHand([highestPair, highestPair, secondHighestPair, secondHighestPair], cards);
+            numericalComboValue = 2;
         } else if(totalCombos === 1 && combos.three) { // three of a kind
             combo = `Three of a kind of ${translateCard(highestThreeOfAKind)}s`;
             playerHand = getStrongestHand([highestThreeOfAKind, highestThreeOfAKind, highestThreeOfAKind], cards);
+            numericalComboValue = 3;
         } else { // high card
             let cardsOrderedByValue = orderCardsByValue(cards); 
             combo = `High card ${translateCard(cardsOrderedByValue[0][0])}`;
@@ -198,10 +224,16 @@ const getValueCombos = (vals, colors, cards) => {
     } else if(flush) { //flush
         combo = `Flush of ${translateSuit(flush)}`;
         playerHand = getFlushCards(flush, cards);
+        numericalComboValue = 5;
     } 
-    return [playerHand, combo];
+    return [playerHand, combo, numericalComboValue];
 }
 
+/**
+ * Order cards array according to their values
+ * @param {array} cards
+ * @returns {array} returns five cards of biggest values 
+ */
 const orderCardsByValue = (cards) => {
     let orderedCards = [...cards];
     orderedCards.forEach(card => { //translate aces
@@ -214,6 +246,12 @@ const orderCardsByValue = (cards) => {
     return orderedCards.splice(0, 5);
 }
 
+/**
+ * Get the best possible hand given board and player cards
+ * @param {array} combo 
+ * @param {array} cards 
+ * @param {boolean} fullHouse 
+ */
 const getStrongestHand = (combo, cards, fullHouse) => {
     let usedCards = [];
     if(combo.length !== 5 || fullHouse) {

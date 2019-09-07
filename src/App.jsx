@@ -3,14 +3,11 @@ import './css/reset.css';
 import './css/App.css';
 import * as utils from './utils/index';
 import Card from './components/Card';
-// import { Route, Switch, BrowserRouter,Redirect   } from 'react-router-dom';
-
 
 class App extends React.Component {
   constructor() {
     super();
 
-    // this.getRandomCard = this.getRandomCard.bind(this);
     this.getHands = this.getHands.bind(this);
     this.shuffleTheDeck = this.shuffleTheDeck.bind(this);
     this.getKey = this.getKey.bind(this);
@@ -28,7 +25,8 @@ class App extends React.Component {
       opponentHandString: '',
       playerHand: [],
       opponentHand: [],
-      gameStep: ''
+      gameStep: '',
+      winner: ''
     }
 
     this.state = this.initialState;
@@ -37,19 +35,10 @@ class App extends React.Component {
   getKey(){
     return this.keyCount++;
   }
-  
-  // getRandomCard() {
-  //   let randomCard = utils.getRandomCards(this.state.remainingCards, 1);
-  //   let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCard);
-  
-  //   this.setState(
-  //     {
-  //       randomlySelectedCards: [...this.state.randomlySelectedCards, randomCard],
-  //       remainingCards: remainingCards
-  //     }
-  //   );
-  // }
 
+  /**
+   * Give players their cards and set the state
+   */
   getHands() {
     let randomCards = utils.getRandomCards(this.state.remainingCards, 4);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
@@ -57,7 +46,6 @@ class App extends React.Component {
     //get opponent hand
     let opponentRandomCards = randomCards.slice(0, 2);
     let playerRandomCards = randomCards.slice(2, 4);
-
 
     this.setState(
       {
@@ -70,11 +58,17 @@ class App extends React.Component {
     );
   }
 
+  /**
+   * Place newly generated cards on the board
+   * @param {number} numberOfCards how many cards to generate 
+   * @param {string} step name of gamestep to set when card hits the board
+   */
   hitThBoard(numberOfCards, step) {
     let randomCards = utils.getRandomCards(this.state.remainingCards, numberOfCards);
     let remainingCards = utils.exludeCardsFromRemaining(this.state.remainingCards, ...randomCards);
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
     let opponentHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.opponentCards)]);
+    let winner = utils.decideWinner([[...playerHand], [...opponentHand]]);
     // let playerHand = utils.getPlayerHand([[2, "d"], [10, "d"], [14, "h"], [10, "c"], [3, "s"], [14, "c"], [9, "d"]]);
 
     this.setState(
@@ -83,14 +77,20 @@ class App extends React.Component {
         remainingCards: remainingCards,
         board: [...this.state.board, ...randomCards],
         playerHandString: playerHand[1],
-        opponentHandString: opponentHand[1],
         playerHand: playerHand[0],
+        playerHandValue: playerHand[2],
+        opponentHandString: opponentHand[1],
         opponentHand: opponentHand[0],
-        gameStep: step
+        opponentHandValue: opponentHand[2],
+        gameStep: step,
+        winner: winner
       }
     );
   }
 
+  /**
+   * Reset state
+   */
   shuffleTheDeck() {
     this.setState(
       {
@@ -103,7 +103,8 @@ class App extends React.Component {
         opponentCards: [],
         opponentHand: [],
         opponentHandString: '',
-        gameStep: ''
+        gameStep: '',
+        winner: ''
       }
     );
   }
@@ -142,11 +143,12 @@ class App extends React.Component {
 
           {this.state.playerHandString && 
           <aside className="app__strongest-hand-wrapper app__strongest-hand-wrapper--opponent">
-          Your strongest set of cards:
+          Your opponent set of cards:
             <ul  className="app__strongest-hand">
               {strongestOpponentHand}
             </ul>  <br/>   
           {this.state.opponentHandString}
+          
           </aside> }
          
         </section>
