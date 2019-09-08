@@ -112,13 +112,19 @@ class App extends React.Component {
   render() {
     let board = this.state.board.map(card => <Card key={this.getKey()} card={card}/>);
     let playerCards = this.state.playerCards.map(card => <Card key={this.getKey()} card={card}/>);
-    let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={this.state.gameStep === 'river' ? card : 'backface'}/>);
+    let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={this.state.gameStep === 'showdown' ? card : 'backface'}/>);
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     let strongestOpponentHand = this.state.opponentHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
       <div className="app">
         <main className="app__table">
-          <ul className="app__board">{board}</ul>
+          <ul className="app__board">
+            {board}
+            {this.state.gameStep === 'showdown' && (this.state.winner !== -1 
+            ? (<span className="winner-info">Winner is player{this.state.winner}</span>) 
+            : (<span className="winner-info">Split</span>) 
+            ) }
+          </ul>
           <ul  className="app__hand app__hand--player">{playerCards}</ul>
           <ul  className="app__hand app__hand--opponent">{opponentCards}</ul>
         </main>
@@ -127,6 +133,7 @@ class App extends React.Component {
           {this.state.gameStep === 'start' && <button className="button button--action"  onClick={(e) => this.hitThBoard(3, 'flop')}>Check</button>}
           {this.state.gameStep === 'flop' && <button className="button button--action" onClick={(e) => this.hitThBoard(1, 'turn')}>Check</button>}
           {this.state.gameStep === 'turn' && <button className="button button--action"  onClick={(e) => this.hitThBoard(1, 'river')}>Check</button>}
+          {this.state.gameStep === 'river' && <button className="button button--action"  onClick={(e) => this.hitThBoard(0, 'showdown')}>Showdown</button>}
           <button className="button button--shuffle"  onClick={this.shuffleTheDeck}>Shuffle</button>
           
           <br />
@@ -141,7 +148,7 @@ class App extends React.Component {
           {this.state.playerHandString}
           </aside> }
 
-          {this.state.playerHandString && this.state.gameStep === 'river' &&
+          {this.state.playerHandString && this.state.gameStep === 'showdown' &&
           <aside className="app__strongest-hand-wrapper app__strongest-hand-wrapper--opponent">
           Your opponent set of cards:
             <ul  className="app__strongest-hand">

@@ -106,3 +106,12 @@ body {
     color: #27ae60;
     background-color: #fff;  
 }
+
+.winner-info {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+}
