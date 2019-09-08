@@ -1,7 +1,7 @@
 import cardsDeck from './cardsDeck';
 import getRandomCards from './getRandomCards';
 import exludeCardsFromRemaining from './exludeCardsFromRemaining';
-import getPlayerHand from './getPlayerHand';
+import getPlayerHand from './handUtils/getPlayerHand';
 import deepArrayClone from './deepArrayClone';
 import decideWinner from './decideWinner';
 

@@ -112,7 +112,7 @@ class App extends React.Component {
   render() {
     let board = this.state.board.map(card => <Card key={this.getKey()} card={card}/>);
     let playerCards = this.state.playerCards.map(card => <Card key={this.getKey()} card={card}/>);
-    let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={card}/>);
+    let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={this.state.gameStep === 'river' ? card : 'backface'}/>);
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     let strongestOpponentHand = this.state.opponentHand.map(card => <Card key={this.getKey()} card={card}/>);
     return (
@@ -141,7 +141,7 @@ class App extends React.Component {
           {this.state.playerHandString}
           </aside> }
 
-          {this.state.playerHandString && 
+          {this.state.playerHandString && this.state.gameStep === 'river' &&
           <aside className="app__strongest-hand-wrapper app__strongest-hand-wrapper--opponent">
           Your opponent set of cards:
             <ul  className="app__strongest-hand">

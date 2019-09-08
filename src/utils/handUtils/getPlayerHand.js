@@ -1,3 +1,9 @@
+import checkValues from './checkValues';
+import findValueIndexInMultidimensionalArray from './findValueIndexInMultidimensionalArray';
+import getStraight from './getStraight';
+import getFlushName from './getFlushName';
+import orderCardsByValue from './orderCardsByValue';
+import getArrayDifference from './getArrayDifference';
 
 const getPlayerHand = (cards) => {
     let valuesAndSuits = checkValues(cards);    
@@ -6,144 +12,6 @@ const getPlayerHand = (cards) => {
 
     return combos;
 }
-
-
-/**
- * Get array of occurances of all cards on a table
- * @param {array} cards 
- * @returns {array} multiple occurances of cards
- */
-const checkValues = (cards) => {
-    let occurances = [];
-    
-    cards.forEach(card => {
-        let val = card[0];
-        if(occurances.length) {
-            let index = findValueIndexInMultidimensionalArray(occurances, val, 0);
-            if(index !== -1) {
-                occurances[index][1] += 1;
-            } else {
-                occurances.push([val, 1]);
-            }
-        } else {
-            occurances.push([val, 1]);
-        }
-    });
-
-    let multiOccurances = getMultipleOccurances(occurances);
-
-    return multiOccurances;
-}
-
-
-/**
- * Return index of item in multidimensional array that matches the inner array val of given index
- * @param {array} array 
- * @param {array} item
- * @param {number} checkIndex an index of inner-dimension of an array 
- */
-const findValueIndexInMultidimensionalArray = (array, item, checkIndex) => {
-    let result = -1;
-    array.forEach( (el, index) => {
-        if(el[checkIndex] === item) {
-            result = index;
-        }
-    })
-
-    return result;
-} 
-
-
-/**
- * Get only multiple occurances of cards
- * @param {array} occurances 
- * @returns {array}
- */
-const getMultipleOccurances = (occurances) => {
-    let result = [];
-    occurances.forEach(el => {
-        if(el[1] > 1) {
-            result.push(el, el[1]);
-        }
-    }) 
-
-    return result;
-}
-
-
-/**
- * Switch aces values from 1 to 14 for value comparisons
- * @param {array} cards
- * @returns {array} 
- */
-const changeAcesValues = (cards) => {
-    cards.forEach(card => {
-        let cardValue = card[0];
-        if(cardValue === 1) card[0] = 14;
-    })
-
-    return cards;
-}
-
-
-/**
- * Get chain of consecutive cards in values
- * @param {array} cardsArray
- * @returns {array} array of cards in straight 
- */
-const getStraight = (cardsArray) => {
-    let cards = [...cardsArray];
-    let straight = [];
-    let colors = [];
-
-    let valsSum = 0;
-    cards.forEach(el => valsSum += el[0]); // get sum of vals
-
-    if(valsSum > 40) { // if vals sum is more than 40, there is no mathematical chance for wheel straight to occur, so change 1's to 14's
-        cards = changeAcesValues(cards);
-    }   
-    
-    let sortedVals = cards.sort((a, b) => { // sort array for straight check
-        return a[0] - b[0];
-    });
-    
-    for(let i = 0; i < sortedVals.length - 1; i++) { // check if there is straight
-        if(sortedVals[i][0] !== sortedVals[i + 1][0] && sortedVals[i][0] + 1 === sortedVals[i + 1][0]) {
-            if(straight.indexOf(sortedVals[i][0]) === -1) {
-                straight.push(sortedVals[i][0]);
-                colors.push(sortedVals[i][1]);
-            };
-            if(straight.indexOf(sortedVals[i + 1][0]) === -1) {
-                straight.push(sortedVals[i + 1][0]);
-                colors.push(sortedVals[i + 1][1]);
-            } 
-        } else if(sortedVals[i][0] !== sortedVals[i + 1][0] && straight.length !== 5){
-            straight = [];
-        }
-    }
-
-    let result = straight.map((val, i) => {
-        return [val, colors[i]];
-    })
-
-    return result.splice(0, 5);
-}
-
-/**
- * Gets array of color occurances, if one color occurs more or equal 5 times, flush is recorded
- * @param {array} colors
- * @returns {string} returns name of the flush 
- */
-const getFlushName = (colors) => {
-    let flush;
-    colors.forEach(color => {
-        if(color[1] >= 5) {
-            flush = color[0];
-        } 
-    })
-    
-    return flush;
-} 
 
 /**
  * If there is a combo, this function will find it
@@ -230,23 +98,6 @@ const getValueCombos = (vals, colors, cards) => {
 }
 
 /**
- * Order cards array according to their values
- * @param {array} cards
- * @returns {array} returns five cards of biggest values 
- */
-const orderCardsByValue = (cards) => {
-    let orderedCards = [...cards];
-    orderedCards.forEach(card => { //translate aces
-        if(card[0] === 1) card[0] = 14;
-    });
-    orderedCards.sort((a, b) => { return b[0] - a[0]; }); //sort
-    orderedCards.forEach(card => { //translate aces back
-        if(card[0] === 14) card[0] = 1;
-    });
-    return orderedCards.splice(0, 5);
-}
-
-/**
  * Get the best possible hand given board and player cards
  * @param {array} combo 
  * @param {array} cards 
@@ -287,22 +138,6 @@ const getStrongestHand = (combo, cards, fullHouse) => {
     } else {
         return [];
     }
-}
-
-const getArrayDifference = (cards, usedCards) => {
-    let unusedCards = [];
-    cards.forEach((card, index) => {
-        let found = false;
-        usedCards.forEach(usedCard => {
-            if(card[0] === usedCard[0] && card[1] === usedCard[1]) found = true;
-        });
-
-        if(!found) {
-            unusedCards.push([card[0], card[1]]);
-        } 
-    });
-
-    return unusedCards;
 }
 
 const getFlushCombo = (cards) => {
