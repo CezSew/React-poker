@@ -20,7 +20,6 @@ class App extends React.Component {
       deck: utils.cardsDeck,
       remainingCards: this.deck,
       randomlySelectedCards: [],
-      playerChips: 1000,
       playerCards: [],
       opponentCards: [],
       board: [],
@@ -33,7 +32,9 @@ class App extends React.Component {
       pot: 0,
       currentPlayer: 0,
       playerMoves: {player0: 0, player1: 0},
-      playersBets: {player0: 0, player1: 0}
+      playersBets: {player0: 0, player1: 0},
+      playerChips: {player0: 1000, player1: 1000},
+      playHistory: []
     }
 
     this.state = this.initialState;
@@ -66,15 +67,7 @@ class App extends React.Component {
   }
 
   mainController(cardsToHitBoard, nextGameStep, player) {
-    /**
-     * IF both players decided
-     *    IF bets are equal
-     *      hitThBoard(cardsToHitBoard, nextGameStep)
-     *    ELSE 
-     *      go to player with lower bet
-     * ELSE 
-     *    go to player who hadn't decided yet -> playerHandleAction(cardsToHitBoard, nextGameStep) OR AIdecide(cardsToHitBoard, nextGameStep)
-     */
+
     let movesAreEqual = false;
     let betsAreEqual = false;
 
@@ -107,6 +100,9 @@ class App extends React.Component {
       this.playerHandleAction(cardsToHitBoard, nextGameStep, [], nextPlayerToAct);
     }
     
+    // keep history slid down
+    let historyBox = document.querySelector('.app__history-box');
+    historyBox.scrollTop = historyBox.scrollHeight - historyBox.clientHeight;
   }
 
   /**
@@ -120,6 +116,17 @@ class App extends React.Component {
     let playerHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.playerCards)]);
     let opponentHand = utils.getPlayerHand([...utils.deepArrayClone(this.state.board), ...utils.deepArrayClone(randomCards), ...utils.deepArrayClone(this.state.opponentCards)]);
     let winner = utils.decideWinner([[...playerHand], [...opponentHand]]);
+    let playersChips = Object.assign({}, this.state.playerChips);
+
+    if(step === 'showdown') {
+      let winnerName = winner === 1 ? 'player1' : (winner === -1 ? 'split' : 'player0');
+      if(winnerName !== 'split') {
+        playersChips[winnerName] += this.state.pot;
+      } else {
+        playersChips['player1'] += this.state.pot/2;
+        playersChips['player0'] += this.state.pot/2;
+      }
+    }
     // let playerHand = utils.getPlayerHand([[2, "d"], [10, "d"], [14, "h"], [10, "c"], [3, "s"], [14, "c"], [9, "d"]]);
 
     this.setState(
@@ -134,6 +141,7 @@ class App extends React.Component {
         opponentHand: opponentHand[0],
         opponentHandValue: opponentHand[2],
         gameStep: step,
+        playerChips: playersChips,
         winner: winner
       }
     );
@@ -149,7 +157,6 @@ class App extends React.Component {
         randomlySelectedCards: [],
         remainingCards: this.deck,
         board: [],
-        playerChips: 1000,
         playerCards: [],
         playerHandString: '',
         playerHand: [],
@@ -168,13 +175,11 @@ class App extends React.Component {
 
   // ON PLAYER ACTION
   playerHandleAction(cards, gameStep, action = ['check', 0], player) {
-    
     let betsAreEqual = false;
     let highestBet = 0;
     const playersBets = Object.assign({}, this.state.playersBets);
-    let playersBetsArray = Object.keys(playersBets).map((item) => {
-      return [item, playersBets[item]];
-    });
+    const playersStacks = Object.assign({}, this.state.playerChips);
+    let playersBetsArray = utils.createPlayerArrayFromObject(playersBets);
     for(let i = 0; i < playersBetsArray.length - 1; i++) {
       let biggestBet = playersBetsArray[i][1] > playersBetsArray[i+1][1] ? playersBetsArray[i][1] : playersBetsArray[i+1][1];
       if(biggestBet > highestBet) { 
@@ -184,44 +189,42 @@ class App extends React.Component {
         betsAreEqual = true;
       }
     }
-
     if(player !== 'player0') {
       if(!betsAreEqual) {
-        console.log('calls for  ' + (highestBet - this.state.playersBets.player1))
         action = ['call', highestBet - this.state.playersBets.player1];
       } else {
         action = ['check', 0];
       }
     } 
-
     let betSize = action[1];
     let playerMoves = Object.assign({}, this.state.playerMoves);
     playerMoves[player] += 1; 
     let updatedPlayerMoves = playerMoves;
     playersBets[player] += betSize;
     let updatedPlayersBets = playersBets;
-
-
+    playersStacks[player] -= betSize;
+    let updatedPlayerStacks = playersStacks;
     if(player !== 'player0') {
-      console.log('OK, I ' + action[0])
       setTimeout(() => {
-        this.setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets);
+        this.setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets, updatedPlayerStacks, action[0]);
       }, 1200);
     } else {
-      this.setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets);
+      this.setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets, updatedPlayerStacks, action[0]);
     }
-
   }
 
-  setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets) {
+  setStateOnPlayerAction(updatedPlayerMoves, cards, gameStep, betSize, player, updatedPlayersBets, updatedPlayerStacks, action) {
+    let actionString = `${player} did ${action}`;
+    if(action === 'bet') actionString += ` ${betSize}`;
     this.setState(
       {
         pot: this.state.pot + betSize,
         currentPlayer: this.state.currentPlayer === 0 ? 1 : 0,
         playersBets: updatedPlayersBets, 
-        playerMoves: updatedPlayerMoves
+        playerMoves: updatedPlayerMoves,
+        playHistory: [...this.state.playHistory, actionString],
+        playerChips: updatedPlayerStacks
       }, () => {
-        console.log(this.state.playersBets)
         this.mainController(cards, gameStep, player)
       }
     );
@@ -233,6 +236,7 @@ class App extends React.Component {
     let opponentCards = this.state.opponentCards.map(card => <Card key={this.getKey()} card={this.state.gameStep === 'showdown' ? card : 'backface'}/>);
     let strongestHand = this.state.playerHand.map(card => <Card key={this.getKey()} card={card}/>);
     let strongestOpponentHand = this.state.opponentHand.map(card => <Card key={this.getKey()} card={card}/>);
+    let history = this.state.playHistory.map(line => <li key={this.getKey()}>{line}</li>);
     return (
       <div className="app">
         <main className="app__table">
@@ -245,6 +249,21 @@ class App extends React.Component {
           </ul>
           <ul  className="app__hand app__hand--player">{playerCards}</ul>
           <ul  className="app__hand app__hand--opponent">{opponentCards}</ul>
+          <div className="app__pot">
+            Pot size: {this.state.pot}
+          </div>
+          <div className="app__player-info app__player-info--player0">
+            <span className="app__playername">Player0</span>
+            <div className="app__player-stack">
+              {this.state.playerChips.player0}
+            </div>
+          </div>
+          <div className="app__player-info app__player-info--player1">
+            <span className="app__playername">Player1</span>
+            <div className="app__player-stack">
+              {this.state.playerChips.player1}
+            </div>
+          </div>
         </main>
         <section className="app__controlls">
           {this.state.gameStep === '' && <button className="button button--action" onClick={this.getHands}>Deal the hands</button>}
@@ -258,19 +277,19 @@ class App extends React.Component {
             <React.Fragment>
               <button className="button button--action" onClick={(e) => this.playerHandleAction(1, 'turn', ['check', 0], 'player0')}>Check</button>
               <button className="button button--shuffle" onClick={this.shuffleTheDeck}>Fold</button>
-              <button className="button button--action" onClick={(e) => { this.playerHandleAction(1, 'turn', ['bet', 20], 'player0')}}>Bet (40)</button>
+              <button className="button button--action" onClick={(e) => { this.playerHandleAction(1, 'turn', ['bet', 40], 'player0')}}>Bet (40)</button>
             </React.Fragment>)}
           {this.state.currentPlayer === 0 && this.state.gameStep === 'turn' && (
             <React.Fragment>
               <button className="button button--action"  onClick={(e) => this.playerHandleAction(1, 'river', ['check', 0], 'player0')}>Check</button>
               <button className="button button--shuffle" onClick={this.shuffleTheDeck}>Fold</button>
-              <button className="button button--action" onClick={(e) => { this.playerHandleAction(1, 'river', ['bet', 20], 'player0')}}>Bet (80)</button>
+              <button className="button button--action" onClick={(e) => { this.playerHandleAction(1, 'river', ['bet', 80], 'player0')}}>Bet (80)</button>
             </React.Fragment>)}
           {this.state.currentPlayer === 0 && this.state.gameStep === 'river' && (
             <React.Fragment>
               <button className="button button--action"  onClick={(e) => this.hitThBoard(0, 'showdown', ['check', 0], 'player0')}>Showdown</button>
               <button className="button button--shuffle" onClick={this.shuffleTheDeck}>Fold</button>
-              <button className="button button--action" onClick={(e) => { this.playerHandleAction(0, 'showdown', ['bet', 20], 'player0')}}>Bet (120)</button>
+              <button className="button button--action" onClick={(e) => { this.playerHandleAction(0, 'showdown', ['bet', 120], 'player0')}}>Bet (120)</button>
             </React.Fragment>)}
           <button className="button button--shuffle"  onClick={this.shuffleTheDeck}>Shuffle</button>
           
@@ -301,6 +320,12 @@ class App extends React.Component {
             <p>Your bet: {this.state.playersBets.player0} chips</p>
             <p>His bet: {this.state.playersBets.player1} chips</p>
           </div>
+          {history.length !== 0 &&
+            <ul className="app__history-box">
+              {history}
+            </ul>
+          }
+
         </section>
         
       </div>

@@ -1,7 +1,30 @@
 body {
     font-family: Roboto, sans-serif
 }
-
+.app__pot {
+    position: absolute;
+    top: 31%;
+    left: calc(50% - 55px);
+    padding: 10px 20px;
+    border-radius: 20px;
+    background-color: rgba(0,0,0,0.7);
+    color: #fff;
+}
+.app__history-box {
+    height: 50px;
+    margin-left: 30px;
+    padding: 10px;
+    overflow: auto;
+    width: 330px;
+    position: absolute;
+    top: 205px;
+    right: 20px;
+    border-radius: 5px;
+    min-height: 120px;
+    box-sizing: border-box;
+    color: #fff;
+    background-color:rgba(0,0,0,0.5);
+}
 .app__board {
     display: flex;
     -webkit-box-shadow: 0px 0px 44px -12px rgba(0,0,0,0.75);
@@ -93,6 +116,7 @@ body {
     background-color: rgba(192,57,43, 0.8);
     color: #fff;
     border-radius: 2px;
+    display: none;
 }
 .button {
     padding: 20px 40px;
@@ -125,6 +149,31 @@ body {
     font-size: 2rem;
     text-align: center;
     width: 100%;
+}
+.app__player-stack {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    color: #fff;
+    padding: 10px 20px;
+}
+.app__player-info {
+    position: absolute;
+    width: 100px;
+    text-align: center;
+    display: flex;
+    left: 20%;
+    align-items: center;
+}
+.app__playername {
+    display: block;
+    margin-right: 10px;
+    color: #fff;
+}
+.app__player-info--player0 {
+    bottom: 45px;
+}
+.app__player-info--player1 {
+    top: 45px;
 }
 
 @media(max-width: 500px) {

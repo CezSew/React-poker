@@ -5,6 +5,7 @@ import getPlayerHand from './handUtils/getPlayerHand';
 import deepArrayClone from './deepArrayClone';
 import decideWinner from './decideWinner';
 import AImakeDecision from './AI/AImakeDecision';
+import createPlayerArrayFromObject from './createPlayerArrayFromObject';
 
 export {
     cardsDeck, 
@@ -13,5 +14,6 @@ export {
     getPlayerHand,
     deepArrayClone,
     decideWinner,
-    AImakeDecision
+    AImakeDecision,
+    createPlayerArrayFromObject
 };
